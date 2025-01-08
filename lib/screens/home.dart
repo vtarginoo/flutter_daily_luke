@@ -24,38 +24,38 @@ class Home extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => GoalsList(),
-                  ),
-                );
-              },
-              child: Container(
-                padding: EdgeInsets.all(8),
-                width: MediaQuery.of(context).size.width * 0.4,
-                //40% da largura da tela
-                height: MediaQuery.of(context).size.height * 0.15,
-                //20% da altura da tela ,
-                color: Colors.blueAccent,
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.emoji_events,
-                      color: Colors.yellow,
-                      size: 32,
+            child: Material(
+              color: Colors.blueAccent,
+              child: InkWell(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => GoalsList(),
                     ),
-                    Text(
-                      "Metas",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    )
-                  ],
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  height: MediaQuery.of(context).size.height * 0.15,
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.emoji_events,
+                        color: Colors.yellow,
+                        size: 32,
+                      ),
+                      Text(
+                        "Metas",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),

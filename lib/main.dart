@@ -1,3 +1,4 @@
+import 'package:daily_luke/screens/goals_form.dart';
 import 'package:daily_luke/screens/goals_list.dart';
 import 'package:daily_luke/screens/home.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class DailyLuke extends StatelessWidget {
             buttonColor: Colors.blueAccent[700],
             textTheme: ButtonTextTheme.primary,
           )),
-      home: Home(),
+      home: GoalsForm(),
     );
   }
 }
