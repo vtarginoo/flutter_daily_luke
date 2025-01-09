@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 
-class GoalsForm extends StatelessWidget {
+import '../models/goal.dart';
+
+class GoalsForm extends StatefulWidget {
   const GoalsForm({super.key});
+
+  @override
+  State<GoalsForm> createState() => _GoalsFormState();
+}
+
+class _GoalsFormState extends State<GoalsForm> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _percentController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -20,31 +30,58 @@ class GoalsForm extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
-                decoration: InputDecoration(
+                controller: _nameController,
+                decoration: const InputDecoration(
                   labelText: "Nome da Meta",
+                  labelStyle: TextStyle(color: Colors.blue, fontSize: 18),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blueAccent),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Colors.blue,
+                        width: 2.0), // Linha quando o campo está focado
+                  ),
                 ),
-                style: TextStyle(fontSize: 24),
+                style: const TextStyle(fontSize: 24),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
-                decoration: InputDecoration(
+                controller: _percentController,
+                decoration: const InputDecoration(
                   labelText: "Percentual Desejado",
+                  labelStyle: TextStyle(color: Colors.blue, fontSize: 18),
+                  fillColor: Colors.blueAccent,
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blueAccent),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Colors.blue,
+                        width: 2.0), // Linha quando o campo está focado
+                  ),
                 ),
-                style: TextStyle(fontSize: 24),
+                style: const TextStyle(fontSize: 24),
                 keyboardType: TextInputType.number,
               ),
             ),
             SizedBox(
               width: double.maxFinite,
-
               child: ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.all(Colors.blueAccent),
                 ),
-                onPressed: () {},
-                child: Text(
+                onPressed: () {
+                  final String name = _nameController.text;
+                  final double percentGoal =
+                      double.tryParse(_percentController.text)!;
+                  final newGoal = Goal(0, name: name, percent: percentGoal);
+
+                  Navigator.pop(context, newGoal);
+                },
+                child: const Text(
                   "Create",
                   style: TextStyle(
                       color: Colors.white,
