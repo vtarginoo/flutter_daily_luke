@@ -2,18 +2,9 @@ import 'package:daily_luke/database/app_database.dart';
 import 'package:daily_luke/screens/home.dart';
 import 'package:flutter/material.dart';
 
-import 'models/goal.dart';
-
 void main() {
-
   runApp(const DailyLuke());
-  save(
-    Goal(0, name: 'futebol', percent: 100),
-  ).then((id) {
-    findAll().then(
-      (goals) => debugPrint(goals.toString()),
-    );
-  });
+
 }
 
 class DailyLuke extends StatelessWidget {

@@ -1,3 +1,4 @@
+import 'package:daily_luke/database/dao/goal_dao.dart';
 import 'package:flutter/material.dart';
 
 import '../models/goal.dart';
@@ -12,7 +13,7 @@ class GoalsForm extends StatefulWidget {
 class _GoalsFormState extends State<GoalsForm> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _percentController = TextEditingController();
-
+  final GoalDao _dao = GoalDao();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,8 +79,7 @@ class _GoalsFormState extends State<GoalsForm> {
                   final double percentGoal =
                       double.tryParse(_percentController.text)!;
                   final newGoal = Goal(0, name: name, percent: percentGoal);
-
-                  Navigator.pop(context, newGoal);
+                  _dao.save(newGoal).then((id) => Navigator.pop(context),);
                 },
                 child: const Text(
                   "Create",
