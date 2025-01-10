@@ -1,9 +1,13 @@
-import 'package:daily_luke/database/app_database.dart';
 import 'package:daily_luke/screens/home.dart';
 import 'package:flutter/material.dart';
 
+import 'database/dao/goal_dao.dart';
+
 void main() {
+  final GoalDao _dao = GoalDao();
   runApp(const DailyLuke());
+
+
 
 }
 
@@ -20,7 +24,7 @@ class DailyLuke extends StatelessWidget {
             buttonColor: Colors.blueAccent[700],
             textTheme: ButtonTextTheme.primary,
           )),
-      home: Home(),
+      home: const Home(),
     );
   }
 }

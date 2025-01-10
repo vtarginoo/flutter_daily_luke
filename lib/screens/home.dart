@@ -1,4 +1,5 @@
-import 'package:daily_luke/screens/goals_list.dart';
+import 'package:daily_luke/component/home_components/custom_inkwell.dart';
+import 'package:daily_luke/screens/goals/goals_list.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatelessWidget {
@@ -6,6 +7,7 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -14,53 +16,57 @@ class Home extends StatelessWidget {
         ),
         backgroundColor: Colors.blueAccent,
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.asset("assets/images/luke1.jpg"),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Material(
-              color: Colors.blueAccent,
-              child: InkWell(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => GoalsList(),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  height: MediaQuery.of(context).size.height * 0.15,
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.emoji_events,
-                        color: Colors.yellow,
-                        size: 32,
-                      ),
-                      Text(
-                        "Metas",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
-                      )
-                    ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Adicionando a imagem acima dos InkWells
+            Image.asset(
+              'assets/images/luke1.jpg',
+              // Caminho da imagem no diretório "assets"
+              height: screenHeight * 0.4, // Tamanho da imagem
+              fit: BoxFit.cover, // Ajuste de como a imagem se encaixa
+            ),
+            const SizedBox(height: 16.0), // Espaço entre a imagem e os InkWells
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: CustomInkwell(
+                    title: 'Metas',
+                    icon: Icons.flag,
+                    onTap: () {
+                      // Navegue ou execute uma ação
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => const GoalsList()));
+                    },
                   ),
                 ),
-              ),
+                const SizedBox(width: 16.0),
+                Expanded(
+                  child: CustomInkwell(
+                    title: 'Daily Input',
+                    icon: Icons.edit,
+                    onTap: () {
+                      // Navegue ou execute uma ação
+                      print("Clique em Daily Input");
+                    },
+                  ),
+                ),
+              ],
             ),
-          )
-        ],
+            const SizedBox(height: 16.0),
+            CustomInkwell(
+              title: 'Dashboard',
+              icon: Icons.dashboard,
+              onTap: () {
+                // Navegue ou execute uma ação
+                print("Clique em Dashboard");
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

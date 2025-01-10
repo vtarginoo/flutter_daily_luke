@@ -1,7 +1,7 @@
-
+import 'package:daily_luke/component/goal_item.dart';
 import 'package:daily_luke/database/dao/goal_dao.dart';
 import 'package:daily_luke/models/goal.dart';
-import 'package:daily_luke/screens/goals_form.dart';
+import 'package:daily_luke/screens/goals/goals_form.dart';
 import 'package:flutter/material.dart';
 
 class GoalsList extends StatefulWidget {
@@ -17,8 +17,8 @@ class _GoalsListState extends State<GoalsList> {
 
   @override
   Widget build(BuildContext context) {
-    goals.add(Goal(0, name: 'Meditação', percent: 80));
-    goals.add(Goal(0, name: 'Futebol', percent: 54));
+    goals.add(Goal(0, name: 'Meditação', targetPercentage: 80));
+    goals.add(Goal(0, name: 'Futebol', targetPercentage: 54));
 
     return Scaffold(
       appBar: AppBar(
@@ -54,7 +54,10 @@ class _GoalsListState extends State<GoalsList> {
               return ListView.builder(
                 itemBuilder: (context, index) {
                   final Goal? goal = goals?[index];
-                  return _GoalItem(goal!);
+                  return GoalItem(
+                    goal: goal!,
+                    onEditPressed: () {},
+                  );
                 },
                 itemCount: goals?.length,
               );
@@ -80,28 +83,6 @@ class _GoalsListState extends State<GoalsList> {
         child: const Icon(
           Icons.add,
           color: Colors.white,
-        ),
-      ),
-    );
-  }
-}
-
-class _GoalItem extends StatelessWidget {
-  final Goal goal;
-
-  const _GoalItem(this.goal);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        title: Text(
-          goal.name,
-          style: const TextStyle(fontSize: 24),
-        ),
-        subtitle: Text(
-          goal.percent.toString(),
-          style: const TextStyle(fontSize: 16),
         ),
       ),
     );
