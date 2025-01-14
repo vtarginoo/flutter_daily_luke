@@ -3,12 +3,12 @@ import 'package:daily_luke/models/goal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class GoalCard extends StatelessWidget {
+class GeneralCard extends StatelessWidget {
   final Goal goal;
   final int diasAteHoje;
   final List<DailyInput> inputList;
 
-  const GoalCard({
+  const GeneralCard({
     Key? key,
     required this.goal,
     required this.diasAteHoje,

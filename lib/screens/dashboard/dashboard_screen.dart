@@ -2,7 +2,8 @@ import 'package:daily_luke/database/dao/daily_input_dao.dart';
 import 'package:daily_luke/database/dao/goal_dao.dart';
 import 'package:daily_luke/models/daily_input.dart';
 import 'package:daily_luke/models/goal.dart';
-import 'package:daily_luke/screens/dashboard/visao_geral/goal_card.dart';
+import 'package:daily_luke/screens/dashboard/visao_geral/general_card.dart';
+import 'package:daily_luke/screens/dashboard/visao_geral/general_chart.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -100,19 +101,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     Text(
                       '$diasAteHoje/365 dias do ano',
                       style: TextStyle(fontSize: 18, color: Colors.grey),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ...goalList.map((goal) {
-                      return GoalCard(
+                      return GeneralCard(
                         goal: goal,
                         diasAteHoje: diasAteHoje,
                         inputList: inputList,
                       );
                     }),
+                    Expanded(
+                      child: GeneralChart(),
+                    ),
                   ],
                 );
               },
