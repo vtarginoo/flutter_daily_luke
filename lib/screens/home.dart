@@ -1,4 +1,5 @@
 import 'package:daily_luke/component/home_components/custom_inkwell.dart';
+import 'package:daily_luke/screens/daily_input/daily_input_list.dart';
 import 'package:daily_luke/screens/goals/goals_list.dart';
 import 'package:flutter/material.dart';
 
@@ -38,8 +39,8 @@ class Home extends StatelessWidget {
                     icon: Icons.flag,
                     onTap: () {
                       // Navegue ou execute uma ação
-                      Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => const GoalsList()));
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const GoalsList()));
                     },
                   ),
                 ),
@@ -49,8 +50,8 @@ class Home extends StatelessWidget {
                     title: 'Daily Input',
                     icon: Icons.edit,
                     onTap: () {
-                      // Navegue ou execute uma ação
-                      print("Clique em Daily Input");
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => DailyInputList()));
                     },
                   ),
                 ),

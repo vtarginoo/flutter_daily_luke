@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:daily_luke/models/goal.dart';
 import 'package:sqflite/sqflite.dart';
 import '../app_database.dart';
@@ -8,20 +10,27 @@ class GoalDao {
       '$_name TEXT, '
       '$_targetPercentage REAL, '
       '$_createdDate TEXT)';  // Campo de data de criação
+
   static const String _tableName = 'goals';
   static const String _id = 'id';
   static const String _name = 'name';
   static const String _targetPercentage = 'target_percentage';
   static const String _createdDate = 'created_date';
 
+  Future<Database> getGoalDatabase () async{
+   return await getDatabase();
+  }
+
+
+
   Future<int> save(Goal goal) async {
-    final Database db = await getDatabase();
+    final Database db = await getGoalDatabase ();
     Map<String, dynamic> goalMap = _toMap(goal);
     return db.insert(_tableName, goalMap);
   }
 
   Future<List<Goal>> findAll() async {
-    final Database db = await getDatabase();
+    final Database db = await getGoalDatabase ();
     final List<Map<String, dynamic>> result = await db.query(_tableName);
     List<Goal> goals = _toList(result);
     return goals;
@@ -29,17 +38,17 @@ class GoalDao {
 
   // Método para limpar a tabela (truncate)
   Future<void> truncate() async {
-    final Database db = await getDatabase();
+    final Database db = await getGoalDatabase ();
     await db.delete(_tableName); // Deleta todos os registros da tabela
   }
 
   Future<void> dropTable() async {
-    final Database db = await getDatabase();
+    final Database db = await getGoalDatabase ();
     await db.execute('DROP TABLE IF EXISTS $_tableName');
   }
 
   Future<void> recreateTable() async {
-    final Database db = await getDatabase();
+    final Database db = await getGoalDatabase ();
     await db.execute(GoalDao.tableSql);
   }
 

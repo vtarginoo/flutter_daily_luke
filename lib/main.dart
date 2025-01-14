@@ -1,12 +1,15 @@
+import 'package:daily_luke/database/app_database.dart';
+import 'package:daily_luke/database/dao/daily_input_dao.dart';
 import 'package:daily_luke/screens/home.dart';
 import 'package:flutter/material.dart';
 
 import 'database/dao/goal_dao.dart';
 
-void main() {
-  final GoalDao _dao = GoalDao();
+void main() async {
+  final GoalDao _dao1 = GoalDao();
+  final DailyInputDao _dao2 = DailyInputDao();
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const DailyLuke());
-
 
 
 }
