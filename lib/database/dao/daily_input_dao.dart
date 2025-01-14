@@ -22,7 +22,6 @@ class DailyInputDao {
     return await getDatabase();
   }
 
-  // Método para salvar ou atualizar o DailyInput
   Future<int> save(DailyInput dailyInput) async {
     final db = await getDailyDB(); // Obtém a instância do banco de dados
 
@@ -37,19 +36,22 @@ class DailyInputDao {
   }
 
   Future<List<DailyInput>> findAll() async {
-    final Database db = getDailyDB() as Database;
-    final List<Map<String, dynamic>> result = await db.query(_tableName);
-    List<DailyInput> dailyInputs = _toList(result);
-    return dailyInputs;
+    final db = await getDailyDB();
+    try {
+      final List<Map<String, dynamic>> maps = await db.query('daily_inputs');
+      print('Registros encontrados: $maps'); // Log dos dados
+      return List.generate(maps.length, (i) => DailyInput.fromMap(maps[i]));
+    } catch (e) {
+      print('Erro no findAll: $e');
+      return []; // Retorne uma lista vazia em caso de erro
+    }
   }
 
-  // Método para limpar a tabela (truncate)
   Future<void> truncate() async {
     final Database db = await getDailyDB();
     await db.delete(_tableName); // Deleta todos os registros da tabela
   }
 
-  // Método para recuperar os inputs de uma data específica
   Future<List<DailyInput>> getDailyInputsByDate(DateTime date) async {
     final db = await getDailyDB(); // Obtém a instância do banco de dados
 
@@ -59,7 +61,8 @@ class DailyInputDao {
     // Consulta os registros para a data fornecida
     final result = await db.query(
       _tableName, // Nome da tabela
-      where: 'action_date LIKE ?', // Filtra pelos registros que têm a mesma data
+      where: 'action_date LIKE ?',
+      // Filtra pelos registros que têm a mesma data
       whereArgs: ['${formattedDate}%'], // Adiciona o filtro da data
     );
 

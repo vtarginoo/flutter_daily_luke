@@ -1,5 +1,7 @@
 import 'package:daily_luke/component/home_components/custom_inkwell.dart';
 import 'package:daily_luke/screens/daily_input/daily_input_list.dart';
+import 'package:daily_luke/screens/dashboard/dashboard_screen.dart';
+
 import 'package:daily_luke/screens/goals/goals_list.dart';
 import 'package:flutter/material.dart';
 
@@ -51,7 +53,7 @@ class Home extends StatelessWidget {
                     icon: Icons.edit,
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => DailyInputList()));
+                          builder: (context) => const DailyInputList()));
                     },
                   ),
                 ),
@@ -62,8 +64,8 @@ class Home extends StatelessWidget {
               title: 'Dashboard',
               icon: Icons.dashboard,
               onTap: () {
-                // Navegue ou execute uma ação
-                print("Clique em Dashboard");
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
               },
             ),
           ],
