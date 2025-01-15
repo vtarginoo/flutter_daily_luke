@@ -114,9 +114,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         inputList: inputList,
                       );
                     }),
-                    Expanded(
-                      child: GeneralChart(),
-                    ),
+                    const SizedBox(height: 40),
+                    GeneralChart(),
+                    const SizedBox(height: 40),
                   ],
                 );
               },

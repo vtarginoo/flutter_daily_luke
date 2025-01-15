@@ -102,4 +102,15 @@ class DailyInputDao {
     }
     return dailyInputs;
   }
+
+  Future<int> countCompletedDaysSince(int goalId, DateTime startDate) async {
+    final db = await getDailyDB();
+
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) as completed FROM $_tableName WHERE $_goalId = ? AND $_input = 1 AND $_actionDate >= ?',
+      [goalId, startDate.toIso8601String()],
+    );
+
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
 }

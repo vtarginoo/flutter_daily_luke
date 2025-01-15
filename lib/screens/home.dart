@@ -1,6 +1,7 @@
 import 'package:daily_luke/component/home_components/custom_inkwell.dart';
 import 'package:daily_luke/screens/daily_input/daily_input_list.dart';
 import 'package:daily_luke/screens/dashboard/dashboard_screen.dart';
+import 'package:daily_luke/screens/dashboard/visao_geral/general_chart.dart';
 
 import 'package:daily_luke/screens/goals/goals_list.dart';
 import 'package:flutter/material.dart';

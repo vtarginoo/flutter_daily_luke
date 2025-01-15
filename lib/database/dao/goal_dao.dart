@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:daily_luke/models/goal.dart';
 import 'package:sqflite/sqflite.dart';
+
 import '../app_database.dart';
 
 class GoalDao {
@@ -9,7 +10,7 @@ class GoalDao {
       '$_id INTEGER PRIMARY KEY, '
       '$_name TEXT, '
       '$_targetPercentage REAL, '
-      '$_createdDate TEXT)';  // Campo de data de criação
+      '$_createdDate TEXT)'; // Campo de data de criação
 
   static const String _tableName = 'goals';
   static const String _id = 'id';
@@ -17,20 +18,18 @@ class GoalDao {
   static const String _targetPercentage = 'target_percentage';
   static const String _createdDate = 'created_date';
 
-  Future<Database> getGoalDatabase () async{
-   return await getDatabase();
+  Future<Database> getGoalDatabase() async {
+    return await getDatabase();
   }
 
-
-
   Future<int> save(Goal goal) async {
-    final Database db = await getGoalDatabase ();
+    final Database db = await getGoalDatabase();
     Map<String, dynamic> goalMap = _toMap(goal);
     return db.insert(_tableName, goalMap);
   }
 
   Future<List<Goal>> findAll() async {
-    final Database db = await getGoalDatabase ();
+    final Database db = await getGoalDatabase();
     final List<Map<String, dynamic>> result = await db.query(_tableName);
     List<Goal> goals = _toList(result);
     return goals;
@@ -38,17 +37,17 @@ class GoalDao {
 
   // Método para limpar a tabela (truncate)
   Future<void> truncate() async {
-    final Database db = await getGoalDatabase ();
+    final Database db = await getGoalDatabase();
     await db.delete(_tableName); // Deleta todos os registros da tabela
   }
 
   Future<void> dropTable() async {
-    final Database db = await getGoalDatabase ();
+    final Database db = await getGoalDatabase();
     await db.execute('DROP TABLE IF EXISTS $_tableName');
   }
 
   Future<void> recreateTable() async {
-    final Database db = await getGoalDatabase ();
+    final Database db = await getGoalDatabase();
     await db.execute(GoalDao.tableSql);
   }
 
@@ -56,7 +55,8 @@ class GoalDao {
     final Map<String, dynamic> goalMap = {};
     goalMap[_name] = goal.name;
     goalMap[_targetPercentage] = goal.targetPercentage;
-    goalMap[_createdDate] = goal.createdDate.toIso8601String();  // Converte para string ISO 8601
+    goalMap[_createdDate] =
+        goal.createdDate.toIso8601String(); // Converte para string ISO 8601
     return goalMap;
   }
 
@@ -67,10 +67,24 @@ class GoalDao {
         row[_id],
         name: row[_name],
         targetPercentage: row[_targetPercentage],
-        createdDate: DateTime.parse(row[_createdDate]),  // Converte a string de volta para DateTime
+        createdDate: DateTime.parse(
+            row[_createdDate]), // Converte a string de volta para DateTime
       );
       goals.add(goal);
     }
     return goals;
+  }
+
+  Future<Goal?> findById(int id) async {
+    final db = await getGoalDatabase();
+    final result = await db.query(
+      _tableName,
+      where: '$_id = ?',
+      whereArgs: [id],
+    );
+
+    if (result.isEmpty) return null;
+
+    return Goal.fromMap(result.first);
   }
 }
