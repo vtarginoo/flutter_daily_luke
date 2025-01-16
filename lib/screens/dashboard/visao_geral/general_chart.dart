@@ -1,92 +1,125 @@
-import 'package:daily_luke/database/dao/daily_input_dao.dart';
-import 'package:daily_luke/database/dao/goal_dao.dart';
-import 'package:daily_luke/models/goal.dart';
-import 'package:daily_luke/service/dashboard_service.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class GeneralChart extends StatefulWidget {
+  final Map<int, double> goalProgress; // Mapa de ID -> Progresso
+  final Map<int, String> goalNames;  // Mapa de IDs para nomes das metas
+
+  const GeneralChart({
+    super.key,
+    required this.goalProgress,
+    required this.goalNames,
+  });
+
   @override
   State<GeneralChart> createState() => GeneralChartState();
 }
 
 class GeneralChartState extends State<GeneralChart> {
-  List<BarChartGroupData> barGroups = [];
+  late List<BarChartGroupData> barGroups; // Lista que armazenará as barras do gráfico
 
   @override
   void initState() {
     super.initState();
-    _loadChartData();  // Carregar dados ao iniciar
+    // Inicializa o gráfico diretamente com os dados recebidos
+    _prepareChartData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-          width: double.infinity,
-          height: 300,
-          margin: EdgeInsets.symmetric(horizontal: 16),
-          child: BarChart(
-            BarChartData(
-              barGroups: barGroups,
-              alignment: BarChartAlignment.spaceEvenly,
-              titlesData: FlTitlesData(
-                leftTitles: AxisTitles(
-                   //drawBelowEverything: true,
-                  sideTitles: SideTitles(
-                    reservedSize: 40, //Espaço
-                    showTitles: true,
-                    interval: 20, // Define a frequência de exibição dos títulos
-                    getTitlesWidget: (value, meta) {
-                      return Text(
-                        value.toStringAsFixed(0), // Exibe o número sem decimais
-                        style: TextStyle(
-                            fontSize: 16), // Ajusta o tamanho da fonte
-                      );
-                    },
-                  ),
-                ),
-                topTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                rightTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
+      width: double.infinity,
+      height: 300,
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: BarChart(
+        BarChartData(
+          maxY: 100, // Garante que o gráfico vá até 100
+          minY: 0,
+          barGroups: barGroups, // Usa as barras geradas diretamente
+          alignment: BarChartAlignment.spaceEvenly,
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                reservedSize: 40, // Espaço
+                showTitles: true,
+                interval: 20, // Frequência de exibição dos títulos
+                getTitlesWidget: (value, meta) {
+                  return Text(
+                    '${value.toStringAsFixed(0)}%', // Exibe o número sem decimais
+                    style: const TextStyle(fontSize: 16), // Ajusta o tamanho da fonte
+                  );
+                },
               ),
             ),
+            topTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                reservedSize: 50, // Espaço reservado para o rótulo
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  final goalName = widget.goalNames[value.toInt()] ?? ''; // Nome da meta
+                  return Text(
+                    goalName, // Exibe o nome da meta
+                    style: const TextStyle(fontSize: 16),
+                    textAlign: TextAlign.center,
+                  );
+                },
+              ),
+            ),
+            rightTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
           ),
-        );
+        ),
+      ),
+    );
   }
-  // Função para carregar dados do banco de dados e atualizar o gráfico
-  Future<void> _loadChartData() async {
-    final dashboardService = DashboardService();
-    final goalDao = GoalDao();
 
-    // Recupera todas as metas (aguarda o Future ser resolvido)
-    final List<Goal> goals = await goalDao.findAll();
-
-    // Recupera a frequência dos inputs (metas alcançadas) para cada meta
+  // Método para montar as barras com base nos parâmetros recebidos
+  void _prepareChartData() {
     List<BarChartGroupData> newBarGroups = [];
-    for (Goal goal in goals) {
-      double frequency = await dashboardService.calculateGoalProgress(goal.id);
-      print(frequency); ///////// Problema está aqui temos que rever!!!!!!
 
+    widget.goalProgress.forEach((goalId, progress) {
+      final goalName = widget.goalNames[goalId] ?? '';
 
-      // Adiciona a frequência da meta ao gráfico
+      // Define a cor com base nas novas regras de progresso
+      Color barColor;
+      if (progress >= 100) {
+        barColor = Colors.green; // 100% ou mais
+      } else if (progress >= 90 && progress < 100) {
+        barColor = Colors.yellow; // Entre 90% e 99%
+      } else {
+        barColor = Colors.red; // Abaixo de 90%
+      }
+
+      // Adiciona a barra correspondente
       newBarGroups.add(
-        BarChartGroupData(x: goal.id, barRods: [
-          BarChartRodData(toY: frequency), // O valor da barra corresponde à frequência
-        ]),
+        BarChartGroupData(
+          x: goalId,
+          barRods: [
+            BarChartRodData(
+              toY: progress,
+              color: barColor,
+              borderRadius: BorderRadius.zero,
+              width: 22,
+              backDrawRodData: BackgroundBarChartRodData(
+                toY: 100, // Valor máximo do gráfico
+                color: Colors.grey[300]!,
+              ),
+            ),
+          ],
+          showingTooltipIndicators: [0],
+        ),
       );
-    }
+    });
 
     setState(() {
-      barGroups = newBarGroups; // Atualiza a lista de barras
+      barGroups = newBarGroups;
     });
-    print(barGroups);
   }
+
 }
 
 

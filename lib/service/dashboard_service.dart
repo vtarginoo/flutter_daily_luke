@@ -1,39 +1,44 @@
 import 'package:daily_luke/database/dao/daily_input_dao.dart';
 import 'package:daily_luke/database/dao/goal_dao.dart';
+import 'package:daily_luke/models/daily_input.dart';
+import 'package:daily_luke/models/goal.dart';
 
 class DashboardService {
+  static final DateTime now = DateTime.now();
+  static final DateTime startOfYear = DateTime(now.year, 1, 1);
+  static final int daysElapsed = now.difference(startOfYear).inDays + 1;
+
   final GoalDao goalDao = GoalDao();
   final DailyInputDao dailyInputDao = DailyInputDao();
 
-  Future<double> calculateGoalProgress(int goalId) async {
+  Future<List<DailyInput>> findAllDailyInput() {
+    return dailyInputDao.findAll();
+  }
+
+  Future<List<Goal>> findAllGoal() {
+    return GoalDao().findAll();
+  }
+
+  Future<int> calculateDaysOfProgress(int goalId) async {
     // Obtém a meta pelo ID
     final goal = await goalDao.findById(goalId);
     if (goal == null) {
       throw Exception("Meta não encontrada.");
     }
-
-    // Dados da meta
-    final targetPercentage = goal.targetPercentage;
-    final createdDate = goal.createdDate;
-
-    // Data atual e início do ano
-    final now = DateTime.now();
-    final startOfYear = DateTime(now.year, 1, 1);
-
-    // Dias passados no ano atual
-    final daysElapsed = now.difference(startOfYear).inDays + 1;
-
-    // Dias realizados desde a data de criação
+    // Dias realizados no ano vigente
     final completedDays =
-        await dailyInputDao.countCompletedDaysSince(goalId, createdDate);
+        await dailyInputDao.countCompletedDaysSince(goalId, startOfYear);
 
-    // Evita divisão por zero no targetPercentage
-    if (targetPercentage == 0) return 0.0;
+    return completedDays;
 
+  }
+
+  Future<double> calculateGoalProgress(
+      int completedDays, double targetPercentage) async {
     // Calcula a porcentagem de progresso
-    final progress = (completedDays / (targetPercentage * daysElapsed)) * 100;
+    final progress = (completedDays / (targetPercentage * daysElapsed)) * 10000;
 
-    return progress.clamp(
-        0.0, 100.0); // Garante que o valor esteja entre 0% e 100%
+    // Formata o progresso para 2 casas decimais e retorna
+    return double.parse(progress.toStringAsFixed(2)).clamp(0.0, 100.0);
   }
 }

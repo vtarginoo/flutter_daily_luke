@@ -1,9 +1,9 @@
-import 'package:daily_luke/database/dao/daily_input_dao.dart';
-import 'package:daily_luke/database/dao/goal_dao.dart';
 import 'package:daily_luke/models/daily_input.dart';
 import 'package:daily_luke/models/goal.dart';
 import 'package:daily_luke/screens/dashboard/visao_geral/general_card.dart';
 import 'package:daily_luke/screens/dashboard/visao_geral/general_chart.dart';
+import 'package:daily_luke/service/dashboard_service.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -12,16 +12,20 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  late Future<List<Goal>> goals;
-  late Future<List<DailyInput>> dailyInputs;
-  int diasAteHoje =
-      DateTime.now().difference(DateTime(DateTime.now().year, 1, 1)).inDays + 1;
+  final DashboardService dashboardService = DashboardService();
+  final int diasAteHoje = DashboardService.daysElapsed;
+
+  late List<Goal> goalList;
+  late List<DailyInput> dailyInputs;
+
+  List<BarChartGroupData> barGroups = [];
+  Map<int, String> goalNames = {};
+  Map<int, double> goalProgress = {};
+  Map<int, int> goalDaysOfProgress = {};
 
   @override
   void initState() {
     super.initState();
-    goals = GoalDao().findAll(); // Carrega as metas
-    dailyInputs = DailyInputDao().findAll(); // Carrega os inputs diários
   }
 
   @override
@@ -59,7 +63,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<List<Goal>>(
-          future: goals,
+          future: dashboardService.findAllGoal(),
           builder: (context, goalSnapshot) {
             if (goalSnapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -73,10 +77,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               return const Center(child: Text('Nenhuma meta encontrada'));
             }
 
-            final List<Goal> goalList = goalSnapshot.data!;
+            goalList = goalSnapshot.data!;
 
             return FutureBuilder<List<DailyInput>>(
-              future: dailyInputs,
+              future: dashboardService.findAllDailyInput(),
               builder: (context, inputSnapshot) {
                 if (inputSnapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -94,30 +98,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 final List<DailyInput> inputList = inputSnapshot.data!;
 
-                return ListView(
-                  children: [
-                    const Text(
-                      'Visão Geral das Metas',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      '$diasAteHoje/365 dias do ano',
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 20),
-                    ...goalList.map((goal) {
-                      return GeneralCard(
-                        goal: goal,
-                        diasAteHoje: diasAteHoje,
-                        inputList: inputList,
-                      );
-                    }),
-                    const SizedBox(height: 40),
-                    GeneralChart(),
-                    const SizedBox(height: 40),
-                  ],
+                return FutureBuilder<void>(
+                  future: _loadData(),
+                  builder: (context, chartSnapshot) {
+                    if (chartSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    return ListView(
+                      children: [
+                        const Text(
+                          'Visão Geral das Metas',
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          '$diasAteHoje/365 dias do ano',
+                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 20),
+                        ...goalList.map((goal) {
+                          return GeneralCard(
+                            goal: goal,
+                            diasAteHoje: diasAteHoje,
+                            daysOfProgress: goalDaysOfProgress[goal.id]?? 0,
+                            progress: goalProgress[goal.id] ?? 0.0,
+                          );
+                        }),
+                        const SizedBox(height: 40),
+                        GeneralChart(
+                             goalNames: goalNames,
+                             goalProgress: goalProgress
+                         ),
+                        const SizedBox(height: 40),
+                      ],
+                    );
+                  },
                 );
               },
             );
@@ -125,5 +143,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _loadData() async {
+    for (Goal goal in goalList) {
+      int daysOfProgress = await dashboardService
+          .calculateDaysOfProgress(goal.id); // Aguarda o cálculo do progresso
+
+      double percentualProgress = await dashboardService.calculateGoalProgress(
+          daysOfProgress, goal.targetPercentage);
+
+      // Adiciona o progresso e o nome da meta no mapa
+      goalNames[goal.id] = goal.name;
+      goalDaysOfProgress[goal.id] = daysOfProgress;
+      goalProgress[goal.id] = percentualProgress;
+
+    }
   }
 }

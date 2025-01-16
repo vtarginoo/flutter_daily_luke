@@ -1,36 +1,37 @@
-import 'package:daily_luke/models/daily_input.dart';
 import 'package:daily_luke/models/goal.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class GeneralCard extends StatelessWidget {
-  final Goal goal;
   final int diasAteHoje;
-  final List<DailyInput> inputList;
+  final Goal goal;
+  final int daysOfProgress;
+  final double progress;
 
   const GeneralCard({
     Key? key,
-    required this.goal,
     required this.diasAteHoje,
-    required this.inputList,
+    required this.goal,
+    required this.daysOfProgress,
+    required this.progress,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final double metaEmDias = diasAteHoje * (goal.targetPercentage / 100);
-    final int atingimento =
-        inputList.where((input) => input.goalId == goal.id).length;
-    final double percentualAtingido = (atingimento / metaEmDias) * 100;
-
     // Determinando a cor de fundo do card com base no percentual atingido
-    Color backgroundColor;
-    if (percentualAtingido >= goal.targetPercentage) {
+    Color backgroundColor = Colors.grey.shade100; // Cor padrão enquanto espera
+
+    // Atualiza a cor de fundo com base no percentual
+    if (progress >= 100) {
       backgroundColor = Colors.green.shade100;
-    } else if (percentualAtingido >= goal.targetPercentage - 5) {
+    } else if (progress >= 100 - 10) {
       backgroundColor = Colors.yellow.shade100;
     } else {
       backgroundColor = Colors.red.shade100;
     }
+
+    int meta =  ((goal.targetPercentage/100) * diasAteHoje).toInt();
+
+
 
     return Card(
       color: backgroundColor,
@@ -48,12 +49,11 @@ class GeneralCard extends StatelessWidget {
 
             // Barra de Progresso Linear
             LinearProgressIndicator(
-              value: percentualAtingido / 100,
+              value: progress / 100,
               backgroundColor: Colors.grey.shade300,
               valueColor: AlwaysStoppedAnimation<Color>(
-                  percentualAtingido >= goal.targetPercentage
-                      ? Colors.green
-                      : Colors.red),
+                progress >= 100 ? Colors.green : Colors.red,
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -61,7 +61,6 @@ class GeneralCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Card Percentual
                 Card(
                   elevation: 3,
                   child: Padding(
@@ -77,7 +76,7 @@ class GeneralCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '$atingimento dias / ${metaEmDias.toStringAsFixed(0)} dias',
+                          '$daysOfProgress dias / $meta dias',
                           style: const TextStyle(
                             fontSize: 18,
                           ),
@@ -102,7 +101,7 @@ class GeneralCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${percentualAtingido.toStringAsFixed(2)}% / ${goal.targetPercentage.toStringAsFixed(2)}%',
+                          '${progress.toStringAsFixed(2)}% / 100%',
                           style: const TextStyle(
                             fontSize: 18,
                           ),
